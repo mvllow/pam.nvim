@@ -1,0 +1,8 @@
+Pam	pam.txt	/*Pam*
+Pam.clean()	pam.txt	/*Pam.clean()*
+Pam.config	pam.txt	/*Pam.config*
+Pam.install()	pam.txt	/*Pam.install()*
+Pam.list()	pam.txt	/*Pam.list()*
+Pam.manage()	pam.txt	/*Pam.manage()*
+Pam.upgrade()	pam.txt	/*Pam.upgrade()*
+pam.nvim	pam.txt	/*pam.nvim*

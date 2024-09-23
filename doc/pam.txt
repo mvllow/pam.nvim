@@ -1,0 +1,98 @@
+*pam.nvim* The package manager for Neovim
+*Pam*
+
+MIT License Copyright (c) mvllow
+
+==============================================================================
+
+Features:
+
+- Install and manage packages
+- Support for URLs and local paths
+- No unnecessary abstractions
+
+# Setup ~
+
+Clone pam.nvim
+>sh
+  git clone https://github.com/mvllow/pam.nvim \
+    ~/.local/share/nvim/site/pack/pam/start/
+<
+
+Manage packages via |Pam.manage()|
+
+------------------------------------------------------------------------------
+                                                                    *Pam.config*
+                                  `Pam.config`
+Type ~
+Config
+
+Default values:
+>lua
+  Pam.config = {
+  	install_path = vim.fn.stdpath("data") .. "/site/pack/pam/start",
+  }
+<
+------------------------------------------------------------------------------
+                                                                  *Pam.manage()*
+                       `Pam.manage`({packages}, {config})
+Parameters ~
+{packages} Package[]
+{config} `(optional)` Config
+
+Usage ~
+>lua
+ Pam.manage({
+   { source = "mvllow/pam.nvim" },
+   {
+     source = "nvim-treesitter/nvim-treesitter",
+     post_checkout = function()
+       vim.cmd("TSUpdate")
+     end,
+     config = function()
+       require("nvim-treesitter.configs").setup()
+     end
+   },
+   {
+     source = "ThePrimeagen/harpoon",
+     branch = "harpoon2",
+     dependencies = {
+       { source = "nvim-lua/plenary.nvim" }
+     }
+   }
+ })
+<
+------------------------------------------------------------------------------
+                                                                 *Pam.install()*
+                           `Pam.install`({packages})
+Parameters ~
+{packages} Package[]
+Usage ~
+:Pam install
+
+------------------------------------------------------------------------------
+                                                                 *Pam.upgrade()*
+                           `Pam.upgrade`({packages})
+Parameters ~
+{packages} Package[]
+Usage ~
+:Pam upgrade
+
+------------------------------------------------------------------------------
+                                                                   *Pam.clean()*
+                            `Pam.clean`({packages})
+Parameters ~
+{packages} Package[]
+Usage ~
+:Pam clean
+
+------------------------------------------------------------------------------
+                                                                    *Pam.list()*
+                             `Pam.list`({packages})
+Parameters ~
+{packages} Package[]
+Usage ~
+:Pam list
+
+
+ vim:tw=78:ts=8:noet:ft=help:norl:
