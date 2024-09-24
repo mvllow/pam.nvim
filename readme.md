@@ -20,7 +20,7 @@ git clone https://github.com/mvllow/pam.nvim \
 Add packages to manage:
 
 ```lua
-Pam.manage({
+require("pam").manage({
     { source = "mvllow/pam.nvim" },
     {
         source = "nvim-treesitter/nvim-treesitter",

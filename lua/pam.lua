@@ -52,7 +52,7 @@ Pam.config = {
 ---@param config? Config
 ---
 ---@usage >lua
----  Pam.manage({
+---  require("pam").manage({
 ---    { source = "mvllow/pam.nvim" },
 ---    {
 ---      source = "nvim-treesitter/nvim-treesitter",
