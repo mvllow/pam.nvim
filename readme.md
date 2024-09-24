@@ -14,7 +14,7 @@ Clone pam.nvim:
 
 ```sh
 git clone https://github.com/mvllow/pam.nvim \
-  ~/.local/share/nvim/site/pack/pam/start/
+  ~/.local/share/nvim/site/pack/pam/start/pam.nvim
 ```
 
 Add packages to manage:
