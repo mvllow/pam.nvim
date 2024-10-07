@@ -33,6 +33,7 @@ require("pam").manage({
     },
     {
         source = "ThePrimeagen/harpoon",
+        as = "baboon",
         branch = "harpoon2",
         dependencies = {
             { source = "nvim-lua/plenary.nvim" }

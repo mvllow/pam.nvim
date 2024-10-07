@@ -27,6 +27,7 @@
 
 ---@class Package
 ---@field source string
+---@field as? string
 ---@field branch? string
 ---@field dependencies? Package[]
 ---@field post_checkout? function
@@ -65,6 +66,7 @@ Pam.config = {
 ---    },
 ---    {
 ---      source = "ThePrimeagen/harpoon",
+---      as = "baboon",
 ---      branch = "harpoon2",
 ---      dependencies = {
 ---        { source = "nvim-lua/plenary.nvim" }
@@ -147,11 +149,15 @@ function Pam.install(packages)
 
 		local package_path = package.source:gsub("^~", vim.fn.expand("$HOME"))
 		local package_name = get_package_name(package_path)
-		local install_path = Pam.config.install_path .. "/" .. package_name
+		local install_path = Pam.config.install_path .. "/" .. (package.as and package.as or package_name)
 
 		if not vim.uv.fs_stat(install_path) then
 			vim.fn.system(build_clone_cmd(package, install_path))
-			notify(string.format("Installed %s", package_name))
+			local package_line = {
+				{ "      " .. "✔ " .. (package.as and package.as or package_name) },
+				{ " (" .. package.source .. ")", "Comment" },
+			}
+			vim.api.nvim_echo(package_line, false, {})
 			installed_any = true
 		end
 
