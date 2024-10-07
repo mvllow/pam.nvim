@@ -271,15 +271,14 @@ function Pam.list(packages)
 	local function list_package(package, prefix)
 		local package_name = get_package_name(package.source)
 		local package_line = {
-			{ prefix .. package_name },
+			{ prefix .. "‣ " .. (package.as and package.as or package_name) },
 			{ " (" .. package.source .. ")", "Comment" },
 		}
 		vim.api.nvim_echo(package_line, false, {})
 
 		if package.dependencies and #package.dependencies > 0 then
 			for i, dependency in ipairs(package.dependencies) do
-				local is_last = i == #package.dependencies
-				local new_prefix = prefix .. (is_last and "└── " or "├── ")
+				local new_prefix = prefix .. "    "
 				list_package(dependency, new_prefix)
 			end
 		end
