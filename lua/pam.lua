@@ -49,42 +49,6 @@ Pam.config = {
 }
 --minidoc_afterlines_end
 
----@param packages Package[]
----@param config? Config
----
----@usage >lua
----  require("pam").manage({
----    { source = "mvllow/pam.nvim" },
----    {
----      source = "nvim-treesitter/nvim-treesitter",
----      post_checkout = function()
----        vim.cmd("TSUpdate")
----      end,
----      config = function()
----        require("nvim-treesitter.configs").setup()
----      end
----    },
----    {
----      source = "ThePrimeagen/harpoon",
----      as = "baboon",
----      branch = "harpoon2",
----      dependencies = {
----        { source = "nvim-lua/plenary.nvim" }
----      }
----    }
----  })
---- <
-function Pam.manage(packages, config)
-	Pam.packages = packages or {}
-	Pam.config = vim.tbl_extend("force", Pam.config, config or {})
-
-	for _, package in ipairs(Pam.packages) do
-		if type(package.config) == "function" then
-			package.config()
-		end
-	end
-end
-
 ---@param msg string
 ---@param level? integer
 ---@private
@@ -137,6 +101,42 @@ local function build_clone_cmd(package, install_path)
 end
 
 ---@param packages Package[]
+---@param config? Config
+---
+---@usage >lua
+---  require("pam").manage({
+---    { source = "mvllow/pam.nvim" },
+---    {
+---      source = "nvim-treesitter/nvim-treesitter",
+---      post_checkout = function()
+---        vim.cmd("TSUpdate")
+---      end,
+---      config = function()
+---        require("nvim-treesitter.configs").setup()
+---      end
+---    },
+---    {
+---      source = "ThePrimeagen/harpoon",
+---      as = "baboon",
+---      branch = "harpoon2",
+---      dependencies = {
+---        { source = "nvim-lua/plenary.nvim" }
+---      }
+---    }
+---  })
+--- <
+function Pam.manage(packages, config)
+	Pam.packages = packages or {}
+	Pam.config = vim.tbl_extend("force", Pam.config, config or {})
+
+	for _, package in ipairs(Pam.packages) do
+		if type(package.config) == "function" then
+			package.config()
+		end
+	end
+end
+
+---@param packages Package[]
 ---@usage :Pam install
 function Pam.install(packages)
 	local installed_any = false
@@ -149,12 +149,12 @@ function Pam.install(packages)
 
 		local package_path = package.source:gsub("^~", vim.fn.expand("$HOME"))
 		local package_name = get_package_name(package_path)
-		local install_path = Pam.config.install_path .. "/" .. (package.as and package.as or package_name)
+		local install_path = Pam.config.install_path .. "/" .. (package.as or package_name)
 
 		if not vim.uv.fs_stat(install_path) then
 			vim.fn.system(build_clone_cmd(package, install_path))
 			local package_line = {
-				{ "      " .. "✔ " .. (package.as and package.as or package_name) },
+				{ "      " .. "✔ " .. (package.as or package_name) },
 				{ " (" .. package.source .. ")", "Comment" },
 			}
 			vim.api.nvim_echo(package_line, false, {})
@@ -199,7 +199,7 @@ function Pam.upgrade(packages)
 			local result = vim.fn.system({ "git", "-C", path, "pull" })
 			if not result:find("Already up to date.") then
 				local package_line = {
-					{ "      " .. "✔ " .. (package.as and package.as or package_name) },
+					{ "      " .. "✔ " .. (package.as or package_name) },
 					{ " (" .. package.source .. ")", "Comment" },
 				}
 				vim.api.nvim_echo(package_line, false, {})
@@ -228,7 +228,8 @@ function Pam.clean(packages)
 	local managed_packages = {}
 
 	local function add_managed_package(package)
-		managed_packages[get_package_name(package.source)] = true
+		local package_name = get_package_name(package.source)
+		managed_packages[package.as or package_name] = true
 		if package.dependencies then
 			for _, dependency in ipairs(package.dependencies) do
 				add_managed_package(dependency)
@@ -275,7 +276,7 @@ function Pam.list(packages)
 	local function list_package(package, prefix)
 		local package_name = get_package_name(package.source)
 		local package_line = {
-			{ prefix .. "‣ " .. (package.as and package.as or package_name) },
+			{ prefix .. "‣ " .. (package.as or package_name) },
 			{ " (" .. package.source .. ")", "Comment" },
 		}
 		vim.api.nvim_echo(package_line, false, {})
