@@ -198,7 +198,11 @@ function Pam.upgrade(packages)
 		if vim.uv.fs_stat(path) then
 			local result = vim.fn.system({ "git", "-C", path, "pull" })
 			if not result:find("Already up to date.") then
-				notify(string.format("Upgraded %s (%s)", package_name, package.source))
+				local package_line = {
+					{ "      " .. "✔ " .. (package.as and package.as or package_name) },
+					{ " (" .. package.source .. ")", "Comment" },
+				}
+				vim.api.nvim_echo(package_line, false, {})
 				upgraded_any = true
 			end
 
