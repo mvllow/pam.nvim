@@ -56,8 +56,6 @@ There are plenty of package managers out there, but none are named pam. Although
 
 ### Generating documentation
 
-Inside of Neovim, with [mini.doc](https://github.com/echasnovski/mini.doc) in your runtimepath:
-
-```vimscript
-:luafile scripts/minidoc.lua
+```bash
+nvim --headless --noplugin -u ./scripts/minimal-init.lua -c "luafile scripts/minidoc.lua" -c "qa!"
 ```
