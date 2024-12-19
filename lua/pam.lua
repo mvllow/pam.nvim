@@ -253,32 +253,9 @@ function Pam.clean(packages)
 	end
 end
 
----@param packages Package[]
----
 ---@usage :Pam list
-function Pam.list(packages)
-	---@param package Package
-	---@param is_dependency boolean
-	local function list_package(package, is_dependency)
-		if not utilities.validate_package_spec(package) then
-			return false
-		end
-
-		local package_name = package.as or utilities.get_package_name(package.source)
-		utilities.notify(("%s %s (%s)"):format(is_dependency and "  └─" or "-", package_name, package.source))
-	end
-
-	utilities.notify("Showing managed packages...")
-	for _, package in ipairs(packages) do
-		-- Indent items with length of "(pam) "
-		list_package(package, false)
-
-		if package.dependencies and #package.dependencies > 0 then
-			for _, dependency in ipairs(package.dependencies) do
-				list_package(dependency, true)
-			end
-		end
-	end
+function Pam.list()
+	vim.cmd("checkhealth pam")
 end
 
 vim.api.nvim_create_user_command("Pam", function(opts)
@@ -290,7 +267,7 @@ vim.api.nvim_create_user_command("Pam", function(opts)
 	elseif subcommand == "clean" then
 		Pam.clean(Pam.packages)
 	elseif subcommand == "list" or subcommand == "status" then
-		Pam.list(Pam.packages)
+		Pam.list()
 	else
 		utilities.notify("Invalid subcommand: " .. subcommand)
 	end
