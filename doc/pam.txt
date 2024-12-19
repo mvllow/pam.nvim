@@ -9,7 +9,7 @@ Features:
 
 - Install and manage packages
 - Support for URLs and local paths
-- No unnecessary abstractions
+- Prefer builtins over abstractions
 
 # Setup ~
 
@@ -68,6 +68,7 @@ Usage ~
                            `Pam.install`({packages})
 Parameters ~
 {packages} Package[]
+
 Usage ~
 :Pam install
 
@@ -76,6 +77,7 @@ Usage ~
                            `Pam.upgrade`({packages})
 Parameters ~
 {packages} Package[]
+
 Usage ~
 :Pam upgrade
 
@@ -84,14 +86,13 @@ Usage ~
                             `Pam.clean`({packages})
 Parameters ~
 {packages} Package[]
+
 Usage ~
 :Pam clean
 
 ------------------------------------------------------------------------------
                                                                     *Pam.list()*
-                             `Pam.list`({packages})
-Parameters ~
-{packages} Package[]
+                                  `Pam.list`()
 Usage ~
 :Pam list
 

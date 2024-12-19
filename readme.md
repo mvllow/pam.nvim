@@ -6,7 +6,7 @@
 
 - Install, upgrade, list, and clean packages
 - Support for URLs and local paths
-- No unnecessary abstractions
+- Prefer builtins over abstractions
 
 ## Getting started
 
