@@ -12,6 +12,3 @@ local install_path = "/tmp/nvim/site/pack/test/start/mini.doc"
 if vim.fn.isdirectory(install_path) then
 	vim.fn.system({ "git", "clone", "--depth=1", url, install_path })
 end
-
--- Generate documentation
-vim.cmd("luafile scripts/minidoc.lua")
