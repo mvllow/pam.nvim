@@ -16,7 +16,7 @@
 --- Clone pam.nvim
 --- >sh
 ---   git clone https://github.com/mvllow/pam.nvim \
----     ~/.local/share/nvim/site/pack/pam/start/pam.nvim
+---   	~/.local/share/nvim/site/pack/pam/start/pam.nvim
 --- <
 ---
 --- Manage packages via |Pam.manage()|
@@ -60,26 +60,26 @@ end
 ---@param config? Config
 ---
 ---@usage >lua
----  require("pam").manage({
----    { source = "mvllow/pam.nvim" },
----    {
----      source = "nvim-treesitter/nvim-treesitter",
----      post_checkout = function()
----        vim.cmd("TSUpdate")
----      end,
----      config = function()
----        require("nvim-treesitter.configs").setup()
----      end
----    },
----    {
----      source = "ThePrimeagen/harpoon",
----      as = "baboon",
----      branch = "harpoon2",
----      dependencies = {
----        { source = "nvim-lua/plenary.nvim" }
----      }
----    }
----  })
+---   require("pam").manage({
+---   	{ source = "mvllow/pam.nvim" },
+---   	{
+---   		source = "nvim-treesitter/nvim-treesitter",
+---   		post_checkout = function()
+---   			vim.cmd("TSUpdate")
+---   		end,
+---   		config = function()
+---   			require("nvim-treesitter.configs").setup()
+---   		end
+---   	},
+---   	{
+---   		source = "ThePrimeagen/harpoon",
+---   		as = "baboon",
+---   		branch = "harpoon2",
+---   		dependencies = {
+---   			{ source = "nvim-lua/plenary.nvim" }
+---   		}
+---   	}
+---   })
 --- <
 function Pam.manage(packages, config)
 	Pam.packages = packages or {}
