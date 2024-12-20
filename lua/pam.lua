@@ -111,20 +111,29 @@ function Pam.install(packages)
 
 		if not vim.uv.fs_stat(install_path) then
 			local repo_path = package.source:find("^http") and package.source or "https://github.com/" .. package.source
-			local clone_command = { "git", "clone", "--depth=1", "--filter=blob:none", "--single-branch", repo_path,
-				install_path }
+			local git_args = { "clone", "--depth=1", "--filter=blob:none", "--single-branch", repo_path, install_path }
 			if package.branch then
-				table.insert(clone_command, "--branch=" .. package.branch)
+				table.insert(git_args, "--branch=" .. package.branch)
 			end
 
-			vim.fn.system(clone_command)
-			utilities.notify("Installing " .. package_name .. " (" .. package.source .. ")")
-			installed_any = true
+			local handle
+			---@diagnostic disable-next-line: missing-fields
+			handle = vim.uv.spawn("git", { args = git_args }, function(code)
+				handle:close()
 
-			if type(package.post_checkout) == "function" then
-				utilities.notify("Running post checkout for " .. package_name)
-				package.post_checkout()
-			end
+				vim.schedule(function()
+					if code == 0 then
+						installed_any = true
+						utilities.notify(("Installing %s (%s)"):format(package_name, package.source))
+						if type(package.post_checkout) == "function" then
+							utilities.notify(("└─ Running post checkout"):format(package_name, package.source))
+							package.post_checkout()
+						end
+					else
+						utilities.notify(("Failed to install '%s'"):format(package_name), vim.log.levels.ERROR)
+					end
+				end)
+			end)
 		end
 	end
 
@@ -138,6 +147,7 @@ function Pam.install(packages)
 			end
 		end
 	end
+
 
 	if installed_any then
 		refresh_help_tags()
