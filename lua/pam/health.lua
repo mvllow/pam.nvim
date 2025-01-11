@@ -15,6 +15,19 @@ local function check_external_tools()
 	end
 end
 
+local function check_config()
+	health.start("Config")
+
+	if vim.uv.fs_stat(Pam.config.install_path) then
+		health.ok("`install_path`: '" .. Pam.config.install_path .. "'")
+	else
+		health.error("`install_path` not found: '" .. Pam.config.install_path .. "'", {
+			"Ensure `Pam.config.install_path` exists.",
+			"Update the install path, e.g.: `require('pam').manage({ ... }, { install_path = '~/.local/share/nvim/site/pack/pam/start' })`",
+		})
+	end
+end
+
 local function check_managed_packages()
 	local packages = Pam.packages
 	health.start(("Managed packages (%s)"):format(#packages))
@@ -76,6 +89,7 @@ end
 
 function M.check()
 	check_external_tools()
+	check_config()
 	check_managed_packages()
 end
 
