@@ -87,7 +87,7 @@ function Pam.manage(packages, config)
 
 	for _, package in ipairs(Pam.packages) do
 		if type(package.config) == "function" then
-			package.config()
+			pcall(package.config)
 		end
 	end
 end
