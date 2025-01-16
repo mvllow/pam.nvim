@@ -236,20 +236,20 @@ function Pam.clean(packages)
 		return
 	end
 
-	local confirm_message = ("(pam) Remove the following directories?\n(pam) - %s\n(pam) [y/N]:"):format(table.concat(
-		paths_to_remove,
-		"\n"))
+	local confirm_message = ("(pam) Unused packages:\n(pam) - %s\n(pam) Remove unused packages? [y/N]: "):format(table
+		.concat(
+			paths_to_remove,
+			"\n"))
 
 	if vim.fn.input(confirm_message):lower() == "y" then
-		utilities.notify("Removing unused packages...")
 		for _, path in ipairs(paths_to_remove) do
 			vim.fn.delete(path, "rf")
-			utilities.notify("Removed " .. path)
+			utilities.notify("Removed" .. path)
 		end
 
 		refresh_help_tags()
 	else
-		utilities.notify("Clean cancelled")
+		vim.print("\n(pam) Clean cancelled")
 	end
 end
 
