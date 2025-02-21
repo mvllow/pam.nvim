@@ -1,6 +1,5 @@
 local M = {}
 local Pam = require("pam")
-local utilities = require("pam.utilities")
 local health = require("vim.health")
 
 local function check_external_tools()
@@ -34,7 +33,7 @@ local function check_managed_packages()
 
 	---@param package Package
 	local function list_package(package)
-		if not utilities.validate_package_spec(package) then
+		if not Pam._validate_package_spec(package) then
 			health.error("Invalid package spec:\n`" .. vim.inspect(package) .. "`", {
 				"Ensure the package has a valid 'source', e.g.: `{ source = 'mvllow/modes.nvim' }`",
 				"See |Pam.manage| for more information."
@@ -42,12 +41,12 @@ local function check_managed_packages()
 			return false
 		end
 
-		local package_name = package.as or utilities.get_package_name(package.source)
+		local package_name = package.as or Pam._get_package_name(package.source)
 		health.ok(("%s `%s`"):format(package_name, package.source))
 
 		if package.dependencies and #package.dependencies > 0 then
 			for _, dependency in ipairs(package.dependencies) do
-				local dependency_name = dependency.as or utilities.get_package_name(dependency.source)
+				local dependency_name = dependency.as or Pam._get_package_name(dependency.source)
 				health.ok(("└─ %s `%s`"):format(dependency_name, dependency.source))
 			end
 		end
@@ -58,10 +57,10 @@ local function check_managed_packages()
 	local managed_packages = {}
 	for _, package in ipairs(packages) do
 		if list_package(package) then
-			managed_packages[package.as or utilities.get_package_name(package.source)] = true
+			managed_packages[package.as or Pam._get_package_name(package.source)] = true
 			if package.dependencies then
 				for _, dependency in ipairs(package.dependencies) do
-					managed_packages[dependency.as or utilities.get_package_name(dependency.source)] = true
+					managed_packages[dependency.as or Pam._get_package_name(dependency.source)] = true
 				end
 			end
 		end

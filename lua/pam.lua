@@ -59,7 +59,7 @@ end
 
 ---@param package Package
 ---@private
-local function validate_package_spec(package)
+function Pam._validate_package_spec(package)
 	if type(package) ~= "table" or not package.source or type(package.source) ~= "string" then
 		return false
 	end
@@ -68,7 +68,7 @@ end
 
 ---@param source string
 ---@private
-local function get_package_name(source)
+function Pam._get_package_name(source)
 	return source:match(".*/(.*)")
 end
 
@@ -134,12 +134,12 @@ function Pam.install(packages)
 
 	---@param package Package
 	local function install_package(package)
-		if not validate_package_spec(package) then
+		if not Pam._validate_package_spec(package) then
 			return
 		end
 
 		local package_path = package.source:gsub("^~", home_dir)
-		local package_name = package.as or get_package_name(package_path)
+		local package_name = package.as or Pam._get_package_name(package_path)
 		local install_path = Pam.config.install_path .. "/" .. package_name
 
 		if vim.uv.fs_stat(install_path) then
@@ -183,12 +183,12 @@ function Pam.upgrade(packages)
 
 	---@param package Package
 	local function upgrade_package(package)
-		if not validate_package_spec(package) then
+		if not Pam._validate_package_spec(package) then
 			return
 		end
 
 		local package_path = package.source:gsub("^~", home_dir)
-		local package_name = package.as or get_package_name(package_path)
+		local package_name = package.as or Pam._get_package_name(package_path)
 		local install_path = Pam.config.install_path .. "/" .. package_name
 
 		if not vim.uv.fs_stat(install_path) then
@@ -242,8 +242,8 @@ function Pam.clean(packages)
 	local managed = {}
 
 	process_with_deps(packages, function(package)
-		if validate_package_spec then
-			managed[package.as or get_package_name(package.source)] = true
+		if Pam._validate_package_spec then
+			managed[package.as or Pam._get_package_name(package.source)] = true
 		end
 	end)
 
