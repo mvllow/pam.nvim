@@ -54,7 +54,11 @@ Pam.config = {
 ---@private
 local function notify(msg, level)
 	level = level or vim.log.levels.INFO
-	vim.notify("(pam) " .. msg, level)
+	if level == vim.log.levels.ERROR then
+		vim.notify("(pam ×) " .. msg, level)
+	else
+		vim.notify("(pam) " .. msg, level)
+	end
 end
 
 ---@param package Package
@@ -82,6 +86,15 @@ local function process_with_deps(packages, fn)
 		if package.dependencies and #package.dependencies > 0 then
 			process_with_deps(package.dependencies, fn)
 		end
+	end
+end
+
+---@param package Package
+---@private
+local function run_post_checkout(package)
+	if type(package.post_checkout) == "function" then
+		notify(("└─ Running post-checkout for %s"):format(package.as or package.source))
+		pcall(package.post_checkout)
 	end
 end
 
@@ -147,28 +160,33 @@ function Pam.install(packages)
 			return
 		end
 
-		local repo_path = package.source:find("^http") and package.source or "https://github.com/" .. package.source
-		local git_args = { "clone", "--depth=1", "--filter=blob:none", "--single-branch", repo_path, install_path }
-		if package.branch then
-			table.insert(git_args, "--branch=" .. package.branch)
-		end
+		if vim.fn.isdirectory(package_path) == 1 then
+			vim.fn.system({ "cp", "-r", package_path, install_path })
+			notify("Installed local package: " .. package_name)
+			run_post_checkout(package)
+		else
+			local repo_path = package.source:find("^http") and package.source or "https://github.com/" .. package.source
+			local git_args = { "clone", "--depth=1", "--filter=blob:none", "--single-branch", repo_path, install_path }
+			if package.branch then
+				table.insert(git_args, "--branch=" .. package.branch)
+			end
 
-		local handle
-		handle = vim.uv.spawn("git", { args = git_args }, function(code)
-			handle:close()
+			local handle
+			---@diagnostic disable-next-line: missing-fields
+			handle = vim.uv.spawn("git", { args = git_args }, function(code)
+				handle:close()
 
-			vim.schedule(function()
-				if code == 0 then
-					notify(("Installing %s (%s)"):format(package_name, package.source))
-					if type(package.post_checkout) == "function" then
-						notify(("└─ Running post checkout"):format(package_name, package.source))
-						package.post_checkout()
+				vim.schedule(function()
+					if code == 0 then
+						notify(("Installed %s (%s)"):format(package_name, package.source))
+						run_post_checkout(package)
+					else
+						notify(("Failed to install %s (%s)"):format(package_name, package.source),
+							vim.log.levels.ERROR)
 					end
-				else
-					notify(("Failed to install '%s'"):format(package_name), vim.log.levels.ERROR)
-				end
+				end)
 			end)
-		end)
+		end
 	end
 
 	process_with_deps(packages, install_package)
@@ -192,11 +210,20 @@ function Pam.upgrade(packages)
 		local install_path = Pam.config.install_path .. "/" .. package_name
 
 		if not vim.uv.fs_stat(install_path) then
+			notify(("Package '%s' is not installed. Skipping upgrade."):format(package_name))
+			return
+		end
+
+		if vim.fn.isdirectory(package_path) == 1 then
+			vim.fn.delete(install_path, "rf")
+			vim.fn.system({ "cp", "-r", package_path, install_path })
+			notify(("Upgraded %s (%s)"):format(package_name, package.source))
+			run_post_checkout(package)
 			return
 		end
 
 		local output = {}
-		local stdout
+		local stdout = vim.uv.new_pipe(false)
 		local handle
 		---@diagnostic disable-next-line: missing-fields
 		handle = vim.uv.spawn("git", {
@@ -204,24 +231,30 @@ function Pam.upgrade(packages)
 			stdio = { nil, stdout, nil }
 
 		}, function(code)
-			handle:close()
-
 			if not stdout then
 				return
 			end
 
 			stdout:close()
+			handle:close()
 
-			if code == 0 and not table.concat(output):find("Already up to date") then
-				notify(("Upgrading %s (%s)"):format(package_name, package.source))
-				if type(package.post_checkout) == "function" then
-					notify(("└─ Running post checkout"):format(package_name, package.source))
-					package.post_checkout()
+			vim.schedule(function()
+				local output_str = table.concat(output)
+				if code == 0 and not output_str:find("Already up to date") then
+					notify(("Upgraded %s (%s)"):format(package_name, package.source))
+					run_post_checkout(package)
+				elseif output_str:find("Already up to date") then
+					notify(("Package '%s' is already up to date."):format(package_name))
+					run_post_checkout(package)
+				else
+					notify(("Failed to upgrade %s (%s)"):format(package_name, package.source), vim.log.levels.ERROR)
 				end
-			else
-				notify(("Failed to upgrade '%s'"):format(package_name), vim.log.levels.ERROR)
-			end
+			end)
 		end)
+
+		if not stdout then
+			return
+		end
 
 		vim.uv.read_start(stdout, function(err, data)
 			assert(not err, err)
@@ -268,7 +301,7 @@ function Pam.clean(packages)
 
 	for _, path in ipairs(to_remove) do
 		vim.fn.delete(path, "rf")
-		notify("Removed" .. path)
+		vim.print("\n(pam) Removed " .. path)
 	end
 
 	refresh_help_tags()
@@ -285,12 +318,12 @@ vim.api.nvim_create_user_command("Pam", function(opts)
 		Pam.install(Pam.packages)
 	elseif subcommand == "upgrade" or subcommand == "update" then
 		Pam.upgrade(Pam.packages)
-	elseif subcommand == "clean" then
+	elseif subcommand == "clean" or subcommand == "health" then
 		Pam.clean(Pam.packages)
 	elseif subcommand == "list" or subcommand == "status" then
 		Pam.list()
 	else
-		notify("Invalid subcommand: " .. subcommand)
+		notify("Invalid subcommand: " .. subcommand, vim.log.levels.WARN)
 	end
 end, {
 	nargs = "+",
