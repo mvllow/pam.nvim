@@ -303,7 +303,7 @@ function Pam.clean(packages)
 	end
 
 	for _, path in ipairs(to_remove) do
-		vim.fn.delete(path, "rf")
+		vim.fn.delete(Pam.config.install_path .. "/" .. path, "rf")
 		vim.print("\n(pam) Removed " .. path)
 	end
 
