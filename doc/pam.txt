@@ -25,7 +25,7 @@ Manage packages via |Pam.manage()|
                                                                     *Pam.config*
                                   `Pam.config`
 Type ~
-Config
+`(Config)`
 
 Default values:
 >lua
@@ -37,8 +37,8 @@ Default values:
                                                                   *Pam.manage()*
                        `Pam.manage`({packages}, {config})
 Parameters ~
-{packages} Package[]
-{config} `(optional)` Config
+{packages} `(Package[])`
+{config} `(optional)` `(Config)`
 
 Usage ~
 >lua
@@ -66,8 +66,9 @@ Usage ~
 ------------------------------------------------------------------------------
                                                                  *Pam.install()*
                            `Pam.install`({packages})
+Install packages
 Parameters ~
-{packages} Package[]
+{packages} `(Package[])`
 
 Usage ~
 :Pam install
@@ -75,8 +76,9 @@ Usage ~
 ------------------------------------------------------------------------------
                                                                  *Pam.upgrade()*
                            `Pam.upgrade`({packages})
+Upgrade packages
 Parameters ~
-{packages} Package[]
+{packages} `(Package[])`
 
 Usage ~
 :Pam upgrade
@@ -84,8 +86,9 @@ Usage ~
 ------------------------------------------------------------------------------
                                                                    *Pam.clean()*
                             `Pam.clean`({packages})
+Clean packages
 Parameters ~
-{packages} Package[]
+{packages} `(Package[])`
 
 Usage ~
 :Pam clean
@@ -93,6 +96,7 @@ Usage ~
 ------------------------------------------------------------------------------
                                                                     *Pam.list()*
                                   `Pam.list`()
+List overview of packages and health
 Usage ~
 :Pam list
 

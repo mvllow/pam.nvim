@@ -139,6 +139,7 @@ function Pam.manage(packages, config)
 	end
 end
 
+--- Install packages
 ---@param packages Package[]
 ---
 ---@usage :Pam install
@@ -193,6 +194,7 @@ function Pam.install(packages)
 	refresh_help_tags()
 end
 
+--- Upgrade packages
 ---@param packages Package[]
 ---
 ---@usage :Pam upgrade
@@ -268,6 +270,7 @@ function Pam.upgrade(packages)
 	refresh_help_tags()
 end
 
+--- Clean packages
 ---@param packages Package[]
 ---
 ---@usage :Pam clean
@@ -307,6 +310,7 @@ function Pam.clean(packages)
 	refresh_help_tags()
 end
 
+--- List overview of packages and health
 ---@usage :Pam list
 function Pam.list()
 	vim.cmd("checkhealth pam")
