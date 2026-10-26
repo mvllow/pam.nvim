@@ -1,3 +1,6 @@
+> [!NOTE]
+> This repository is archived in favour of Neovim's built-in package manager, `vim.pack`.
+
 # pam.nvim
 
 > The package manager for Neovim
